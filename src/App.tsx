@@ -1,13 +1,53 @@
 import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
+import './assets/custom.css'
+import './assets/mantine.css'
+import { HomePage } from './pages/Home.page';
+import { MainContext } from './contexts';
+import { useContext } from 'react';
+import { GetPin } from './pages/GetPin.page';
+import { AppShell, Box, Flex, Text } from '@mantine/core';
+import { useOnline } from './hooks';
+import { Header } from './components';
+import { notifications, Notifications } from '@mantine/notifications';
+import { useTruckLocation } from './components/Stops/MapView/useTruckLocation';
 
-import { MantineProvider } from '@mantine/core';
-import { Router } from './Router';
-import { theme } from './theme';
+export default function App(props: any) {
+  const { state, dispatch } = useContext(MainContext)
+  useTruckLocation(state && state.settings && state.settings.site ? state.settings.site.truckRefreshRate : 5)
+  useOnline({
+    online: () => {
+      dispatch({ type: 'setOnline', payload: true })
+      notifications.show({ color: 'green', title: 'You are back online.', message: '' })
+    },
+    offline: () => {
+      dispatch({ type: 'setOnline', payload: false })
+      notifications.show({ color: 'red', title: 'Connection to the network has been lost.', message: 'Application is now in READ ONLY mode!' })
+    }
+  });
 
-export default function App() {
   return (
-    <MantineProvider theme={theme}>
-      <Router />
-    </MantineProvider>
-  );
+    <>
+      <AppShell
+        header={{ height: 0 }}
+        padding="xs"
+      >
+        <Header />
+        <AppShell.Main pt={0}>
+          <Box pos='relative'>
+            <Notifications position="top-right" zIndex={1000} autoClose={5000} />
+            <HomePage open={state.pin !== undefined} />
+            <GetPin open={state.pin === undefined} />
+          </Box>
+        </AppShell.Main>
+        <AppShell.Footer zIndex={true ? 'auto' : 201}>
+          <Flex justify="center">
+            <Text size="xs">Copyright<span>&copy;</span> Habitat for Humanity Tucson 2024</Text>
+          </Flex>
+        </AppShell.Footer>
+
+      </AppShell>
+    </>
+  )
 }

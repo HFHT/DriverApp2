@@ -1,4 +1,6 @@
 # Mantine Vite template
+Send receipt, send reschedule
+ScheduleContext - handle addImage (when an image is attached update the database), when an image is removed, make it part of the reschedule / complete process.
 
 ## Features
 

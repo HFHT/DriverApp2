@@ -1,11 +1,18 @@
-import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
-import { Welcome } from '../components/Welcome/Welcome';
+import { StopEdit, Stops } from '@/components';
+import { MainContext, ScheduleContext } from '@/contexts';
+import { useContext } from 'react';
 
-export function HomePage() {
+interface HomePageType {
+  open: boolean
+}
+export function HomePage({ open }: HomePageType) {
+  if (!open) return <></>
+  const { state } = useContext(ScheduleContext)
+  if (!state) return <>Loading...</>
   return (
     <>
-      <Welcome />
-      <ColorSchemeToggle />
+      <Stops open={!state.joined} />
+      <StopEdit open={!!state.joined} />
     </>
   );
 }

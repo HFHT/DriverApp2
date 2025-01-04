@@ -1,0 +1,44 @@
+html,
+body {
+    overflow: hidden;
+}
+
+.headlogo {
+    display: flex;
+    flex-direction: row;
+    margin: 4px 8px 0 8px;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.show {
+    display: unset;
+}
+
+.hide {
+    display: none;
+}
+
+.maplink {
+    cursor: pointer;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.a_link {
+    color: -webkit-link;
+    cursor: pointer;
+    display: flex;
+}
+
+.a_link:active {
+    color: -webkit-activeLink;
+}
+
+.a_link:hover {
+    scale: 120%;
+}

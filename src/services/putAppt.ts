@@ -1,11 +1,19 @@
+import { notifications } from "@mantine/notifications"
 import { fetchJson } from "."
 
 export async function putAppt(props: any) {
+    const hasError = (theResult: any) => {
+        if (theResult.err) return { err: true, color: 'red', title: 'Save failed!!', message: `Reason: ${theResult.error.message}` }
+        return { err: false, color: 'green', title: 'Save complete.', message: 'Receipt email sent.' }
+    }
     const options = {
         method: "PUT",
         headers: new Headers(),
         body: JSON.stringify(props)
     }
-    return await fetchJson(`${import.meta.env.VITE_DRIVER_URL}putAppt`, options)
+    const retVal = await fetchJson(`${import.meta.env.VITE_DRIVER_URL}putAppt`, options)
+    const error = hasError(retVal)
+    notifications.show({ color: error.color, title: error.title, message: error.message, autoClose: 9000 })
+    return
 
 }

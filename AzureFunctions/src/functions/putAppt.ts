@@ -1,4 +1,5 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import { sendEmail } from "../utils";
 var MongoClient = require('mongodb').MongoClient;
 
 export type RequestType = {
@@ -7,7 +8,7 @@ export type RequestType = {
     cmds: RequestCmdsType[]
 }
 export type RequestCmdsType = {
-    cmd: 'complete' | 'reschedule' | 'addImage' | 'removeImage' | 'driverNote' | 'items',
+    cmd: 'complete' | 'reschedule' | 'image' | 'proof' | 'driverNote' | 'items' | 'receipt',
     jsonValue: any
 }
 export async function putAppt(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
@@ -23,14 +24,18 @@ export async function putAppt(request: HttpRequest, context: InvocationContext):
                 case 'complete':
                     results = [...results, await stopUpdate(client, req.cmds[i], context)]
                     break
-                case 'addImage':
-                case 'removeImage':
+                case 'proof':
+                case 'image':
+                    results = [...results, await image(client, req.cmds[i], context)]
                     break
                 case 'items':
                     results = [...results, await items(client, req.cmds[i], context)]
                     break
                 case 'driverNote':
                     results = [...results, await driverNote(client, req.cmds[i], context)]
+                    break
+                case 'receipt':
+                    results = [...results, await sendEmail(client, req.cmds[i], context)]
                     break
                 default: results = [...results, 'bad command']
             }
@@ -46,6 +51,19 @@ export async function putAppt(request: HttpRequest, context: InvocationContext):
     }
 
 };
+const image = async (client: any, reqObject: RequestCmdsType, context: any) => {
+    //reqObject.cmd: 'proof' | 'image'
+    //jsonValue contains: {_id: d_id, cmd: 'add' | 'remove', img:[ uniqueName: string, name: string, url: string ] } }
+    context.log('image', reqObject)
+    const imageList = reqObject.jsonValue.img.map((im: any) => im.uniqueName)
+    context.log('image', imageList)
+    if (reqObject.cmd === 'proof') {
+        let result = await client.db('Scheduler').collection('Donations').updateOne({ _id: reqObject.jsonValue._id }, { $set: { 'proof': [...imageList] } })
+        return result
+    }
+    let result = await client.db('Scheduler').collection('Donations').updateOne({ _id: reqObject.jsonValue._id }, { $set: { 'pickup.imgs': [...imageList] } })
+    return result
+}
 const driverNote = async (client: any, reqObject: RequestCmdsType, context: any) => {
     //jsonValue contains: {_id: d_id, driverNote: string} }
     let result = await client.db('Scheduler').collection('Donations').updateOne({ _id: reqObject.jsonValue._id }, { $set: { 'driverNote': reqObject.jsonValue.driverNote } })

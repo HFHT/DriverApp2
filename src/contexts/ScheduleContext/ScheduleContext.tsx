@@ -1,8 +1,9 @@
 import { createContext, JSXElementConstructor, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useReducer } from 'react';
-import { SchedAndApptsType, SchedulerApptType, SchedulerDonationType, SchedulerDonorType, StopDetailJoined, useGetApptsforDay } from './useGetApptsforDay';
+import { SchedAndApptsType, StopDetailJoined, useGetApptsforDay } from './useGetApptsforDay';
 import { SchedulerStopType } from "@/contexts/ScheduleContext/useGetApptsforDay";
-import { putAppt } from '@/services';
+import { putAppt, putImage } from '@/services';
 import { MainContext } from '../MainContext/MainContext';
+import { theDate } from '@/utils';
 
 const initialState: SchedAndApptsType = {
     schedDate: undefined,
@@ -105,37 +106,37 @@ export const ScheduleContextProvider = (props: any) => {
             }
             case "reschedule": {
                 console.log(state.joined)
-                if (!state.joined || !state.joined.donation || !state.joined.appt) {
+                if (!state.joined || !state.joined.donation || !state.joined.appt || !state.schedDate) {
                     console.warn('Schedule-Context-reschedule state.joined is undefined')
                     return state
                 }
                 putAppt({
-                    _id: mainState.date,
+                    _id: state.schedDate._id,
                     cmds: [
                         {
                             cmd: 'reschedule',
                             jsonValue: {
-                                _id: '2024-12-02', d_id: state.joined.appt.donationId, status: { code: 'resched', date: '2024-12-02', by: 'driver' }
+                                _id: state.schedDate._id, d_id: state.joined.appt.donationId, status: { code: 'resched', date: theDate(), by: 'driver' }
                             }
                         },
                         { cmd: 'driverNote', jsonValue: { _id: state.joined.donation._id, driverNote: state.joined.donation.driverNote } }
                     ]
                 })
-                return state
+                return { ...state, joined: undefined }
             }
             case "complete": {
                 console.log(state.joined)
-                if (!state.joined || !state.joined.donation || !state.joined.appt) {
+                if (!state.joined || !state.joined.donation || !state.joined.appt || !state.schedDate) {
                     console.warn('Schedule-Context-complete state.joined is undefined')
                     return state
                 }
                 putAppt({
-                    _id: mainState.date,
+                    _id: state.schedDate._id,
                     cmds: [
                         {
                             cmd: 'complete',
                             jsonValue: {
-                                _id: '2024-12-02', d_id: state.joined.appt.donationId, status: { code: 'completed', date: '2024-12-02', by: 'driver' }
+                                _id: state.schedDate._id, d_id: state.joined.appt.donationId, status: { code: 'completed', date: theDate(), by: 'driver' }
                             }
                         },
                         {
@@ -143,7 +144,25 @@ export const ScheduleContextProvider = (props: any) => {
                                 _id: state.joined.donation._id, delivery: state.joined.donation.delivery.items, pickup: state.joined.donation.pickup.items
                             }
                         },
-                        { cmd: 'driverNote', jsonValue: { _id: state.joined.donation._id, driverNote: state.joined.donation.driverNote } }
+                        { cmd: 'driverNote', jsonValue: { _id: state.joined.donation._id, driverNote: state.joined.donation.driverNote } },
+                        { cmd: 'receipt', jsonValue: { type: 'receipt', _id: state.joined.donor?._id, d_id: state.joined.donation._id } }
+                    ]
+                })
+                return { ...state, joined: undefined }
+            }
+            case "proof": {
+                console.log(state.joined)
+                if (!state.joined || !state.joined.donation || !state.joined.appt || !state.schedDate) {
+                    console.warn('Schedule-Context-proof state.joined is undefined')
+                    return state
+                }
+                putImage({
+                    _id: state.schedDate._id,
+                    cmds: [
+                        {
+                            cmd: 'proof',
+                            jsonValue: { ...action.payload, _id: state.joined.donation._id }
+                        }
                     ]
                 })
                 return state
@@ -155,7 +174,7 @@ export const ScheduleContextProvider = (props: any) => {
 
 export type ScheduleContextStateActionType = {
     payload: any
-    type: 'reset' | 'set' | 'addItem' | 'itemComplete' | 'driverNote' | 'setStop' | 'clearStop' | 'complete' | 'reschedule' | 'fetch' | 'updateDonor' | 'updateDonation' | 'updateImages' | 'fetchBoth' | 'cancel' | 'move' | 'update' | 'setRouteSlot' | 'saveSched' | 'saveAppt' | 'saveDonation' | 'address' | 'updateRoute' | 'reverse' | 'block' | 'print'
+    type: 'reset' | 'set' | 'addItem' | 'itemComplete' | 'driverNote' | 'setStop' | 'clearStop' | 'complete' | 'reschedule' | 'proof'
 }
 
 export type ScheduleContextType = {

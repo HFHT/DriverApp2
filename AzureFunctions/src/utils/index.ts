@@ -1,2 +1,5 @@
+export * from './dateUtilities'
 export * from './fetchApptsForDay'
 export * from './queryGet'
+export * from './sendEmail'
+export * from './templateFill'

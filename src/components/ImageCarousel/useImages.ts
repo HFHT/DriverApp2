@@ -4,12 +4,12 @@ import { notifications } from '@mantine/notifications';
 import { imageStringToType, ImagesType, mergeImages } from ".";
 import { MainContext, ScheduleContext } from "@/contexts";
 
-export function useImages() {
+export function useImages(callBack?: (e: any) => void) {
     const { sasToken } = useContext(MainContext)
     const { state } = useContext(ScheduleContext)
 
     const [imageChanged, setImageChanged] = useState(false)
-    const [imageList, setImageList] = useState<ImagesType[] | undefined>(undefined)
+    const [imageList, setImageList] = useState<ImagesType[] | []>([])
     const [imagePreview, setImagePreview] = useState<string | undefined>(undefined)
     const [isBusy, setIsBusy] = useState(false)
     const [imageProgress, setImageProgress] = useState(0);
@@ -18,9 +18,10 @@ export function useImages() {
     const imageAction = (action: { cmd: 'Add' | 'Delete' | 'View' | 'CloseView' | 'Reset', idx: number, img: ImagesType[], url?: string | undefined }) => {
 
         console.log(action)
-        if (!imageList) return
+        // if (!imageList) return
         switch (action.cmd) {
             case 'Add':
+                console.log('imageAction-Add', action.img)
                 setImageList([...imageList, ...action.img])
                 action.img.forEach((ie) => {
                     imageUpload(ie, (url: string) =>
@@ -32,12 +33,17 @@ export function useImages() {
                     )
                 })
                 setImageChanged(true)
+                if (callBack !== undefined) {
+                    console.log('imageAction-callBack', action.img)
+                    callBack({ ...action })
+                }
                 break
             case 'Delete':
                 let updatedList = [...imageList]
                 updatedList.splice(action.idx, 1)
                 setImageList([...updatedList])
                 setImageChanged(true)
+                callBack && callBack({ ...action })
                 break
             case 'Reset':
                 setImageList(imageStringToType(mergeImages(state.joined!.donation)))

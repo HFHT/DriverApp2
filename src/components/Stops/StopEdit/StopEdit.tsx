@@ -1,12 +1,13 @@
 import { ImageCarousel, ItemList, StopEditCard } from "@/components";
 import { ScheduleContext } from "@/contexts";
-import { Box, Button, Divider, Group, Image, LoadingOverlay, Modal, Text, Textarea, Title } from "@mantine/core";
+import { Box, Button, Divider, Group, Image, LoadingOverlay, Modal, ScrollArea, Text, Textarea, Title } from "@mantine/core";
 import { useContext } from "react";
 import { useStopEdit } from "./useStopEdit";
 
 interface StopEditInterface {
     open: boolean
 }
+
 export function StopEdit({ open }: StopEditInterface) {
     const { dispatch, state, isBusy } = useContext(ScheduleContext)
     const { imageList, proofList, imageChanged, imageAction, proofAction, isBusy: imageBusy, preview, joined, reschedule, complete } = useStopEdit()
@@ -22,39 +23,46 @@ export function StopEdit({ open }: StopEditInterface) {
                     <Button variant='outline' color='orange' onClick={() => dispatch({ type: 'reschedule', payload: undefined })}>Reschedule</Button>
                     <Button variant='outline' color='green' onClick={() => dispatch({ type: 'complete', payload: undefined })}>Complete</Button>
                 </Group>
-                <StopEditCard stopDetail={state.joined} />
-                <ImageCarousel
-                    mt='xs'
-                    images={imageList}
-                    disabled
-                    callBack={(e: any) => {
-                        imageAction(e)
-                    }}
-                    slideSize={{ base: '20%', sm: '20%' }}
-                    align="start"
-                    slideGap={{ base: 4, sm: 2 }}
-                    withControls={false}
-                    open={true}
-                    hasChanged={imageChanged}
-                />
-                <ImageCarousel
-                    mt='xs'
-                    images={proofList}
-                    callBack={(e: any) => {
-                        proofAction(e)
-                    }}
-                    slideSize={{ base: '20%', sm: '20%' }}
-                    align="start"
-                    slideGap={{ base: 4, sm: 2 }}
-                    withControls={false}
-                    open={true}
-                    hasChanged={imageChanged}
-                />
-                <Divider pb='xs' mt={2} />
-                <ItemList />
-                <Textarea value={state.joined?.donation?.driverNote} pt='xs' placeholder='Driver notes...'
-                    onChange={(e) => dispatch({ type: 'driverNote', payload: e.currentTarget.value })}
-                />
+                <ScrollArea h={document.documentElement.clientHeight - 170} scrollbars="y" >
+                    <StopEditCard stopDetail={state.joined} />
+                    <ImageCarousel
+                        mt='xs'
+                        images={imageList ? imageList : []}
+                        disabled
+                        callBack={(e: any) => {
+                            imageAction(e)
+                        }}
+                        slideSize={{ base: '20%', sm: '20%' }}
+                        align="start"
+                        slideGap={{ base: 4, sm: 2 }}
+                        withControls={false}
+                        open={true}
+                        hasChanged={imageChanged}
+                    />
+                    <ImageCarousel
+                        mt='xs'
+                        images={proofList ? proofList : []}
+                        callBack={(e: any) => {
+                            console.log('StopEdit-ImageCarousel',e)
+                            proofAction(e)
+                        }}
+                        slideSize={{ base: '20%', sm: '20%' }}
+                        align="start"
+                        slideGap={{ base: 4, sm: 2 }}
+                        withControls={false}
+                        open={true}
+                        hasChanged={imageChanged}
+                    />
+                    <Divider pb='xs' mt={2} />
+                    <ItemList />
+                    <Textarea
+                        value={(state && state.joined && state.joined.donation && state.joined.donation.driverNote) ? state.joined.donation.driverNote : ''}
+                        autosize
+                        pt='xs'
+                        placeholder='Driver notes...'
+                        onChange={(e) => dispatch({ type: 'driverNote', payload: e.currentTarget.value })}
+                    />
+                </ScrollArea>
             </Box>
             <Modal opened={preview !== undefined} title='Image Viewer'
                 onClose={() => {

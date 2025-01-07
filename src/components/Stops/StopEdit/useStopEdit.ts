@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 export function useStopEdit() {
     const { state, dispatch } = useContext(ScheduleContext)
     const { imageChanged, imageList, imageAction, imagePreview, setImageList, isBusy: isImageBusy } = useImages()
-    const { imageChanged: proofChanged, imageList: proofList, imageAction: proofAction, imagePreview: proofPreview, setImageList: setProofList, isBusy: isProofBusy } = useImages()
+    const { imageChanged: proofChanged, imageList: proofList, imageAction: proofAction, imagePreview: proofPreview, setImageList: setProofList, isBusy: isProofBusy } = useImages((e) => { console.log('useStopEdit-callBack', e); dispatch({ type: 'proof', payload: { ...e } }) })
     const [joined, setJoined] = useState<StopDetailJoined | undefined>(undefined)
     const [allImages, setAllImages] = useState([])
     const [proofImages, setProofImages] = useState([])

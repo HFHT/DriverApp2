@@ -1,13 +1,12 @@
 import '@mantine/carousel/styles.css';
 import { Carousel } from '@mantine/carousel';
-import { Button, Image, Menu, useMantineTheme } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
-import { IconArrowBack, IconCircleX, IconEye, IconPhotoX } from '@tabler/icons-react';
+import { Button, Image, Menu } from '@mantine/core';
+import { IconArrowBack, IconEye, IconPhotoX } from '@tabler/icons-react';
 import classes from './ImageCarousel.module.css'
 import { InputImages } from './InputImages';
 
 interface ImageCarouselInterface {
-    images: ImagesType[] | undefined
+    images: ImagesType[] | []
     callBack: Function
     hasChanged: boolean
     height?: number
@@ -31,12 +30,10 @@ export type ImagesType = {
     blob: any
 }
 export function ImageCarousel({ images, callBack, hasChanged, slideSize, slideGap, align, controlSize, controlsOffset, withIndicators, withControls, open = true, height, mb = 0, mt = 0, ml = 0, disabled = false }: ImageCarouselInterface) {
-    const theme = useMantineTheme();
-    const mobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`)
 
     if (!open) return
-    if (images === undefined) return
     const theSelection = (theAction: any) => {
+        console.log('ImageCarousel-theSelection', theAction)
         callBack(theAction)
     }
     const slides = images.map((image: ImagesType, idx: number) => (
@@ -70,7 +67,7 @@ export function ImageCarousel({ images, callBack, hasChanged, slideSize, slideGa
                 {slides}
             </Carousel>
             {!disabled &&
-                <InputImages images={images} setImages={(e: any) => theSelection({ cmd: 'Add', img: e, idx: images.length })} mode='donation' />
+                <InputImages images={images} setImages={(e: any) => theSelection({ cmd: 'Add', img: e, idx: undefined })} mode='donation' />
             }
             {hasChanged && !disabled &&
                 <Button variant="light" ml='sm' size='sm'

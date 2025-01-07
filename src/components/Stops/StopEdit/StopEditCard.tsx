@@ -42,7 +42,7 @@ export function StopEditCard({ stopDetail }: StopEditCardInterface) {
                             <IconMapPin className='a_link'/>
                         </a>
                     </Grid.Col>
-                    <Grid.Col span={12}><Text size='sm'>{stopDetail.donation.driverNote}</Text></Grid.Col>
+                    {/* <Grid.Col span={12}><Text size='sm'>{stopDetail.donation.driverNote}</Text></Grid.Col> */}
                 </Grid>
             </Card>
             <Modal opened={opened} onClose={close} title='Send Text Message'  >

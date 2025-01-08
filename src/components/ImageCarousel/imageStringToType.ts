@@ -7,7 +7,7 @@ export function imageStringToType(images: string[] | undefined): ImagesType[] {
         return `${import.meta.env.VITE_STORAGEIMAGEURL}${url}`
     }
 
-    return images?.map((img) => { return { name: '', url: fullUrl(img), blob: undefined } })
+    return images?.map((img) => { return { name: img, url: fullUrl(img), blob: undefined } })
 }
 
 export function imageObjectToString(images: ImagesType[] | undefined): string[] {

@@ -14,7 +14,7 @@ export function Stops({ open }: StopsInterface) {
                     <RouteControl open={open} />
                 </Grid.Col>
                 <Grid.Col span={1}>
-                    <Refresh />
+                    <Refresh open={open} />
                 </Grid.Col>
             </Grid>
             <ScheduleControl open={open} />

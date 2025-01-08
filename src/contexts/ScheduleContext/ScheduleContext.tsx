@@ -110,8 +110,12 @@ export const ScheduleContextProvider = (props: any) => {
                     console.warn('Schedule-Context-reschedule state.joined is undefined')
                     return state
                 }
+                const stopIdx = state.schedDate.stops.findIndex((ssf) => ssf.d_id === state.joined!.appt!.donationId)
+                if (stopIdx === -1) return state
+                state.schedDate.stops[stopIdx].status = { code: 'resched', date: mainState.date!, by: 'driver' }
                 putAppt({
                     _id: state.schedDate._id,
+                    showMessage: false,
                     cmds: [
                         {
                             cmd: 'reschedule',
@@ -130,8 +134,13 @@ export const ScheduleContextProvider = (props: any) => {
                     console.warn('Schedule-Context-complete state.joined is undefined')
                     return state
                 }
+                const stopIdx = state.schedDate.stops.findIndex((ssf) => ssf.d_id === state.joined!.appt!.donationId)
+                if (stopIdx === -1) return state
+                state.schedDate.stops[stopIdx].status = { code: 'completed', date: mainState.date!, by: 'driver' }
+
                 putAppt({
                     _id: state.schedDate._id,
+                    showMessage: true,
                     cmds: [
                         {
                             cmd: 'complete',
@@ -152,9 +161,23 @@ export const ScheduleContextProvider = (props: any) => {
             }
             case "proof": {
                 console.log(state.joined)
-                if (!state.joined || !state.joined.donation || !state.joined.appt || !state.schedDate) {
+                if (!state.joined || !state.joined.donation || !state.joined.donation._id || !state.schedDate) {
                     console.warn('Schedule-Context-proof state.joined is undefined')
                     return state
+                }
+                const donationIdx = state.donations.findIndex((ssf) => ssf._id === state.joined!.donation!._id)
+                if (donationIdx === -1) {
+                    console.warn('Schedule-Context-proof donation not found')
+                    return state
+                }
+                if (action.payload.cmd === 'Delete') {
+                    let updatedList = [...state.donations[donationIdx].proof === undefined ? [] : state.donations[donationIdx].proof]
+                    state.donations[donationIdx].proof = [...updatedList.splice(action.payload.idx, 1)]
+                } else {
+                    state.donations[donationIdx].proof = [
+                        ...state.donations[donationIdx].proof === undefined ? [] : state.donations[donationIdx].proof,
+                        ...action.payload.img.map((im: any) => im.uniqueName)
+                    ]
                 }
                 putImage({
                     _id: state.schedDate._id,

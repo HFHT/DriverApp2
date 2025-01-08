@@ -50,7 +50,7 @@ export function ImageCarousel({ images, callBack, hasChanged, slideSize, slideGa
                         </Menu.Item>
                     </div>
                     {!disabled &&
-                        <div onClick={() => theSelection({ cmd: 'Delete', img: image, idx: idx })}>
+                        <div onClick={() => theSelection({ cmd: 'Delete', img: [{ ...image }], idx: idx })}>
                             <Menu.Item leftSection={<IconPhotoX style={{ width: 'rem(14)', height: 'rem(14)' }} />}>
                                 Remove
                             </Menu.Item>

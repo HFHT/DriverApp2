@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 import { BlockBlobClient, AnonymousCredential } from "@azure/storage-blob";
 import { notifications } from '@mantine/notifications';
 import { imageStringToType, ImagesType, mergeImages } from ".";
@@ -7,7 +7,6 @@ import { MainContext, ScheduleContext } from "@/contexts";
 export function useImages(callBack?: (e: any) => void) {
     const { sasToken } = useContext(MainContext)
     const { state } = useContext(ScheduleContext)
-
     const [imageChanged, setImageChanged] = useState(false)
     const [imageList, setImageList] = useState<ImagesType[] | []>([])
     const [imagePreview, setImagePreview] = useState<string | undefined>(undefined)
@@ -16,8 +15,7 @@ export function useImages(callBack?: (e: any) => void) {
     const [imageErr, setImageErr] = useState({ hasError: false, errDesc: '' });
 
     const imageAction = (action: { cmd: 'Add' | 'Delete' | 'View' | 'CloseView' | 'Reset', idx: number, img: ImagesType[], url?: string | undefined }) => {
-
-        console.log(action)
+        console.log('useImages-imageAction', action)
         // if (!imageList) return
         switch (action.cmd) {
             case 'Add':
@@ -40,8 +38,9 @@ export function useImages(callBack?: (e: any) => void) {
                 break
             case 'Delete':
                 let updatedList = [...imageList]
-                updatedList.splice(action.idx, 1)
-                setImageList([...updatedList])
+                console.log(action)
+                console.log(imageList)
+                setImageList([...imageList.filter((ilf) => ilf.name !== action.img[0].name)])
                 setImageChanged(true)
                 callBack && callBack({ ...action })
                 break

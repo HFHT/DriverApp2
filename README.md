@@ -1,6 +1,5 @@
 # Mantine Vite template
 
-
 ## Features
 
 This template comes with the following features:

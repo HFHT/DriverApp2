@@ -1,13 +1,16 @@
 import { useTextMessage } from "@/components";
+import { MainContext } from "@/contexts";
 import { StopDetailJoined } from "@/contexts/ScheduleContext/useGetApptsforDay";
 import { Button, Card, Grid, Group, Modal, Select, Stack, Text, Textarea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDeviceMobileMessage, IconMapPin, IconPhoneOutgoing } from "@tabler/icons-react";
+import { useContext } from "react";
 
 interface StopEditCardInterface {
     stopDetail: StopDetailJoined | undefined
 }
 export function StopEditCard({ stopDetail }: StopEditCardInterface) {
+    const { state: mainState } = useContext(MainContext)
     const [opened, { open, close }] = useDisclosure(false)
     const { textMessage, setTextMessage, sendMessage, clearMessage } = useTextMessage()
     const textMsgs = [
@@ -29,7 +32,7 @@ export function StopEditCard({ stopDetail }: StopEditCardInterface) {
                     </Grid.Col>
                     <Grid.Col span={1} pb={4}>
                         <a title='place call' href={`tel:${stopDetail.donor.phone}`}>
-                            <IconPhoneOutgoing className='a_link'/>
+                            <IconPhoneOutgoing className='a_link' />
                         </a>
                     </Grid.Col>
                     <Grid.Col span={11}><Text size='sm'>{stopDetail.donor.name.company}</Text></Grid.Col>
@@ -38,8 +41,8 @@ export function StopEditCard({ stopDetail }: StopEditCardInterface) {
                     <Grid.Col span={6}><Text size='sm'>{stopDetail.donor.place.city}</Text></Grid.Col>
                     <Grid.Col span={5}><Text size='sm'>{stopDetail.donor.place.zip}</Text></Grid.Col>
                     <Grid.Col span={1}>
-                        <a title='Google Map Link' className='maplink' href={`http://maps.google.com/?q=${stopDetail.donor.place.lat},${stopDetail.donor.place.lng}`}>
-                            <IconMapPin className='a_link'/>
+                        <a title='Google Map Link' className={`${mainState.online ? '' : 'a_disabled'} maplink`} href={`http://maps.google.com/?q=${stopDetail.donor.place.lat},${stopDetail.donor.place.lng}`}>
+                            <IconMapPin className='a_link' />
                         </a>
                     </Grid.Col>
                     {/* <Grid.Col span={12}><Text size='sm'>{stopDetail.donation.driverNote}</Text></Grid.Col> */}

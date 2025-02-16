@@ -1,5 +1,8 @@
 # Mantine Vite template
 
+Offline mode - FUTURE - cache the actions and handle them when back online.
+Maps - offline, is there a way to cache the city / routes?
+
 ## Features
 
 This template comes with the following features:

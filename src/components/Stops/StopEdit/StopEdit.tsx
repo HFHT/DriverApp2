@@ -1,5 +1,5 @@
 import { ImageCarousel, ItemList, StopEditCard } from "@/components";
-import { ScheduleContext } from "@/contexts";
+import { MainContext, ScheduleContext } from "@/contexts";
 import { Box, Button, Divider, Group, Image, LoadingOverlay, Modal, ScrollArea, Text, Textarea, Title } from "@mantine/core";
 import { useContext } from "react";
 import { useStopEdit } from "./useStopEdit";
@@ -9,6 +9,7 @@ interface StopEditInterface {
 }
 
 export function StopEdit({ open }: StopEditInterface) {
+    const { state: mainState } = useContext(MainContext)
     const { dispatch, state, isBusy } = useContext(ScheduleContext)
     const { imageList, proofList, imageChanged, proofChanged, imageAction, proofAction, isBusy: imageBusy, preview, reset } = useStopEdit()
 
@@ -23,11 +24,11 @@ export function StopEdit({ open }: StopEditInterface) {
                         dispatch({ type: 'clearStop', payload: undefined })
                         reset()
                     }}>Back</Button>
-                    <Button variant='outline' color='orange' onClick={() => {
+                    <Button variant='outline' color='orange' disabled={!mainState.online} onClick={() => {
                         dispatch({ type: 'reschedule', payload: undefined })
                         reset()
                     }}>Reschedule</Button>
-                    <Button variant='outline' color='green' onClick={() => {
+                    <Button variant='outline' color='green' disabled={!mainState.online} onClick={() => {
                         dispatch({ type: 'complete', payload: undefined })
                         reset()
                     }}>Complete</Button>

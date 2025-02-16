@@ -42,3 +42,9 @@ body {
 .a_link:hover {
     scale: 120%;
 }
+
+.a_disabled {
+    color: grey;
+    pointer-events: none;
+    cursor: not-allowed;
+}

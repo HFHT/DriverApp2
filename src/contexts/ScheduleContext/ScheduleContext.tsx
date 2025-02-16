@@ -1,7 +1,7 @@
 import { createContext, JSXElementConstructor, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useReducer } from 'react';
 import { SchedAndApptsType, StopDetailJoined, useGetApptsforDay } from './useGetApptsforDay';
 import { SchedulerStopType } from "@/contexts/ScheduleContext/useGetApptsforDay";
-import { putAppt, putImage } from '@/services';
+import { putAppt, putImage, schedulerAPI } from '@/services';
 import { MainContext } from '../MainContext/MainContext';
 import { theDate } from '@/utils';
 
@@ -112,6 +112,26 @@ export const ScheduleContextProvider = (props: any) => {
                 }
                 const stopIdx = state.schedDate.stops.findIndex((ssf) => ssf.d_id === state.joined!.appt!.donationId)
                 if (stopIdx === -1) return state
+
+                console.log(state)
+                if (state.schedDate.stops[stopIdx].status.code !== 'resched') {         //Do not send another reschedule if already rescheduled
+                    schedulerAPI({
+                        _id: state.schedDate._id,
+                        appt_fk: undefined,
+                        cmds: [
+                            {
+                                cmd: 'addReschedule',
+                                jsonValue: {
+                                    appt: state.schedDate.stops[stopIdx],
+                                    appts: state.joined.appt,
+                                    donor: state.joined.donor,
+                                    donation: state.joined.donation
+                                }
+                            }
+                        ]
+                    })
+                }
+
                 state.schedDate.stops[stopIdx].status = { code: 'resched', date: mainState.date!, by: 'driver' }
                 putAppt({
                     _id: state.schedDate._id,
@@ -126,16 +146,37 @@ export const ScheduleContextProvider = (props: any) => {
                         { cmd: 'driverNote', jsonValue: { _id: state.joined.donation._id, driverNote: state.joined.donation.driverNote } }
                     ]
                 })
+
                 return { ...state, joined: undefined }
             }
             case "complete": {
-                console.log(state.joined)
+                console.log(state)
                 if (!state.joined || !state.joined.donation || !state.joined.appt || !state.schedDate) {
                     console.warn('Schedule-Context-complete state.joined is undefined')
                     return state
                 }
                 const stopIdx = state.schedDate.stops.findIndex((ssf) => ssf.d_id === state.joined!.appt!.donationId)
                 if (stopIdx === -1) return state
+
+                console.log(state)
+                if (state.schedDate.stops[stopIdx].status.code === 'resched') {         //Remove reschedule if completed
+                    schedulerAPI({
+                        _id: state.schedDate._id,
+                        appt_fk: undefined,
+                        cmds: [
+                            {
+                                cmd: 'removeReschedule',
+                                jsonValue: {
+                                    appt: state.schedDate.stops[stopIdx],
+                                    appts: state.joined.appt,
+                                    donor: state.joined.donor,
+                                    donation: state.joined.donation
+                                }
+                            }
+                        ]
+                    })
+                }
+
                 state.schedDate.stops[stopIdx].status = { code: 'completed', date: mainState.date!, by: 'driver' }
 
                 putAppt({

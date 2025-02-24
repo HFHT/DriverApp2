@@ -73,6 +73,7 @@ export type SchedulerDonorType = {
     anonymous: boolean                                              // anonymous donor, _id will be 'anonymous'
     name: SchedulerDonorNameType
     email: string
+    note?: string | undefined
     zip: string
     phone: string
     place: SchedulerDonorPlaceType

@@ -122,7 +122,7 @@ export const ScheduleContextProvider = (props: any) => {
                             {
                                 cmd: 'addReschedule',
                                 jsonValue: {
-                                    appt: state.schedDate.stops[stopIdx],
+                                    appt: { ...state.schedDate.stops[stopIdx], status: { code: 'resched', date: theDate(), by: 'driver' } },
                                     appts: state.joined.appt,
                                     donor: state.joined.donor,
                                     donation: state.joined.donation

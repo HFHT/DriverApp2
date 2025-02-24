@@ -1,4 +1,4 @@
-import { MainContext, ScheduleContext } from "@/contexts";
+import { ScheduleContext } from "@/contexts";
 import { SchedulerStopType, StopDetailJoined } from "@/contexts/ScheduleContext/useGetApptsforDay";
 import { useTheme } from "@/hooks";
 import { Badge, Card, Grid, Text } from "@mantine/core";
@@ -11,7 +11,6 @@ interface StopCardInterface {
 }
 export function StopCard({ stopDetail, stopNumber }: StopCardInterface) {
     const { state, joinStopDetail, dispatch } = useContext(ScheduleContext)
-    // const { dispatch } = useContext(MainContext)
     const { dark } = useTheme()
     let joinedStop: StopDetailJoined = joinStopDetail(stopDetail)
     if (!joinedStop.appt || !joinedStop.donor || !joinedStop.donation) { console.warn('StopCard appt, donor or donation not found', stopDetail, state.donors, state.donations); return }
@@ -37,7 +36,8 @@ export function StopCard({ stopDetail, stopNumber }: StopCardInterface) {
                     <Grid.Col span={12}><Text size='sm'>{`${joinedStop.donor.place.num} ${joinedStop.donor.place.route} `}<b><i>{joinedStop.donor.place.address2}</i></b></Text></Grid.Col>
                     <Grid.Col span={6}><Text size='sm'>{joinedStop.donor.place.city}</Text></Grid.Col>
                     <Grid.Col span={4}><Text size='sm'>{joinedStop.donor.place.zip}</Text></Grid.Col>
-                    <Grid.Col span={12}><Text size='sm'>{joinedStop.donation.driverNote}</Text></Grid.Col>
+                    {joinedStop.donor.note && <Grid.Col span={12}><Text size='sm'>{joinedStop.donor.note}</Text></Grid.Col>}
+                    {joinedStop.donation.driverNote &&<Grid.Col span={12}><Text size='sm'>{joinedStop.donation.driverNote}</Text></Grid.Col>}
                 </Grid>
             </Card>
         </>

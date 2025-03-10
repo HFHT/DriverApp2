@@ -13,13 +13,14 @@ export async function putTruckLocation(request: HttpRequest, context: Invocation
     try {
         let results = await client.db('Scheduler').collection('TruckLocation').updateOne({ _id: req._id }, { $set: { ...req } }, { upsert: true })
         let data = await client.db('Scheduler').collection('TruckLocation').find().toArray()
+        await client.close()
         return {
             status: 200,
             body: JSON.stringify({ data: data, request: req, results: results })
         }
     } catch (error) {
         context.error(error)
-        client.close()
+        await client.close()
         return { body: JSON.stringify({ err: true, error: error }), status: 501 }
     }
 };

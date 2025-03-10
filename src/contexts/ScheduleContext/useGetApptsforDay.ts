@@ -10,7 +10,7 @@ export function useGetApptsforDay() {
     async function fetchMongo(_id: string) {
         try {
             setIsBusy(true)
-            const retVal = await getApptsforDay({ query: { _id: theDate(_id) } })
+            const retVal = await getApptsforDay(theDate(_id))
             if (retVal.err) {
                 console.warn('getApptForDay error:', retVal.error)
             } else {

@@ -40,13 +40,14 @@ export async function putAppt(request: HttpRequest, context: InvocationContext):
                 default: results = [...results, 'bad command']
             }
         }
+        await client.close()
         return {
             status: 200,
             body: JSON.stringify({ data: [], request: req, results: results })
         }
     } catch (error) {
         context.error(error)
-        client.close()
+        await client.close()
         return { body: JSON.stringify({ err: true, error: error }), status: 501 }
     }
 
